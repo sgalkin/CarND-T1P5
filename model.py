@@ -10,15 +10,18 @@ class Model:
         self._scaler = StandardScaler()
         self._model = None
 
-    def load(self, name):
+    @staticmethod
+    def load(name):
+        m = Model()
         with open(name, 'rb') as f:
             x = pickle.load(f)
-            self._scaler = x['scaler']
-            self._model = x['model']
+            m._scaler = x['scale']
+            m._model = x['model']
+        return m
 
     def store(self, name):
         with open(name, 'wb') as f:
-            pickle.dump({'scaler': self._scaler,
+            pickle.dump({'scale': self._scaler,
                          'model': self._model}, f)
 
     def train(self, C, X, y):
@@ -40,6 +43,5 @@ if __name__ == '__main__':
     assert(m.predict([[1]]) == [1])
     with tempfile.NamedTemporaryFile(mode='w+b', delete=True) as f:
         m.store(f.name)
-        n = Model()
-        n.load(f.name)
+        n = Model.load(f.name)
         assert(n.predict([[1]]) == [1])
